@@ -232,9 +232,9 @@ on_bookmarks_remove(CsBookmarks *self)
 
                 if (found_link) {
                         priv->links = g_list_remove(priv->links, found_link);
-                        link_free(found_link);
+                        link_unref(found_link);
                 }
-                link_free(link);
+                link_unref(link);
         }
 }
 

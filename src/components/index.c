@@ -23,7 +23,7 @@
 #include "index.h"
 #include "treeview.h"
 #include "utils.h"
-#include "models/link.h"
+#include "models_internal.h"
 
 /* Signals */
 enum {

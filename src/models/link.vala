@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Ji YongGang <jungleji@gmail.com>
+ *  Copyright (C) 2012 Andrey Kutejko <andy128k@gmail.com>
  *
  *  ChmSee is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,39 +17,24 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-#ifndef __CS_LINK_H__
-#define __CS_LINK_H__
+enum LinkType {
+    BOOK,
+    PAGE,
+}
 
-#include <glib.h>
+class Link {
+    public string name;
+    public string uri;
+    public LinkType type;
 
-G_BEGIN_DECLS
+    public Link(LinkType type, string name, string uri) {
+        this.type = type;
+        this.name = name;
+        this.uri = uri;
+    }
 
-typedef struct _Link Link;
+    public Link copy() {
+        return new Link(type, name, uri);
+    }
+}
 
-#define LINK(x) ((Link *) x)
-
-typedef enum {
-        LINK_TYPE_BOOK,
-        LINK_TYPE_PAGE,
-} LinkType;
-
-struct _Link {
-        gchar   *name;
-        gchar   *uri;
-        LinkType type;
-
-        guint    ref_count;
-};
-
-Link *link_new(LinkType, const gchar *, const gchar *);
-Link *link_copy(const Link *);
-void  link_free(Link *);
-
-gint  link_compare(gconstpointer, gconstpointer);
-void  link_change_type(Link *, LinkType);
-Link* link_ref(Link *);
-void  link_unref(Link *);
-
-G_END_DECLS
-
-#endif /* __CS_LINK_H__ */

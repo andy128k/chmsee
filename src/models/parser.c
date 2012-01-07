@@ -24,7 +24,7 @@
 
 #include "parser.h"
 #include "utils.h"
-#include "models/link.h"
+#include "models_internal.h"
 
 static gint     depth = -1;
 static gint     prev_depth = -1;

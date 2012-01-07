@@ -22,7 +22,7 @@
 
 #include <gtk/gtk.h>
 
-#include "models/link.h"
+#include "models_internal.h"
 
 G_BEGIN_DECLS
 

@@ -34,7 +34,7 @@
 #include "utils.h"
 #include "models/bookmarksfile.h"
 #include "models/parser.h"
-#include "models/link.h"
+#include "models_internal.h"
 
 typedef struct _CsChmfilePrivate CsChmfilePrivate;
 
@@ -779,7 +779,7 @@ static void
 free_list_data(gpointer data, gpointer user_data)
 {
         Link *link = (Link *)data;
-        link_free(link);
+        link_unref(link);
 }
 
 static void

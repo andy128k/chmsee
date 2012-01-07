@@ -265,7 +265,7 @@ insert_node(CsToc *self, GNode *node, GtkTreeIter *parent_iter)
         Link *link = node->data;
 
         if (g_node_n_children(node))
-                link_change_type(link, LINK_TYPE_BOOK);
+                link->type = LINK_TYPE_BOOK;
 
         GtkTreeIter iter;
         gtk_tree_store_append(priv->store, &iter, parent_iter);

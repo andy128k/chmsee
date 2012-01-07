@@ -5,7 +5,10 @@ set(PACKAGE_VERSION "1.3.1.1" )
 
 set(CMAKE_BUILD_TYPE Release)
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/vala)
+
 find_package(PkgConfig)
+find_package(Vala REQUIRED)
 
 pkg_check_modules (CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 libxml-2.0 gtk+-2.0>=2.18 nspr)
 pkg_search_module(WEBKIT REQUIRED webkit-1.0)

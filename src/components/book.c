@@ -32,7 +32,7 @@
 #include "html-webkit.h"
 #include "utils.h"
 #include "models/chmfile.h"
-#include "models/link.h"
+#include "models_internal.h"
 
 /* Signals */
 enum {
@@ -477,7 +477,7 @@ html_title_changed_cb(CsHtmlWebkit *html, const gchar *title, CsBook *self)
                                               get_short_uri(priv->model, location));
 
                         cs_bookmarks_set_current_link(CS_BOOKMARKS (priv->bookmarks_page), link);
-                        link_free(link);
+                        link_unref(link);
                 }
                 g_free(location);
         }

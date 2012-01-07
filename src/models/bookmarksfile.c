@@ -24,7 +24,7 @@
 
 #include "bookmarksfile.h"
 #include "utils.h"
-#include "models/link.h"
+#include "models_internal.h"
 
 static gchar *strip_string(gchar *);
 static gchar *escape_parse(gchar *);
@@ -154,7 +154,7 @@ static void
 save_bookmark(Link *link, FILE *fd)
 {
         fprintf(fd, "%s=%s\n", link->name, link->uri);
-        link_free(link);
+        link_unref(link);
 }
 
 /* External functions */

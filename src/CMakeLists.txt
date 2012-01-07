@@ -1,3 +1,5 @@
+include(UseVala)
+
 include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -10,6 +12,13 @@ add_definitions(
 link_directories(
         ${CHMSEE_LIBRARY_DIRS}
         )
+
+vala_precompile(MODELS_C
+        models/link.vala
+    PACKAGES
+        glib-2.0
+    GENERATE_HEADER
+        models)
 
 set(CHMSEE_SRCS
         chmsee.h chmsee.c
@@ -27,10 +36,10 @@ set(CHMSEE_SRCS
         )
 set(CHMSEE_SRCS
         ${CHMSEE_SRCS}
+        ${MODELS_C}
         models/bookmarksfile.h models/bookmarksfile.c
         models/chmfile.h models/chmfile.c
         models/parser.h models/parser.c
-        models/link.h models/link.c
         )
 
 add_library(chmseelib STATIC ${CHMSEE_SRCS})
