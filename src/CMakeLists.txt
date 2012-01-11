@@ -7,52 +7,51 @@ include_directories(
         )
 add_definitions(
         ${CHMSEE_CFLAGS_OTHER}
+        -DGETTEXT_PACKAGE="ChmSee"
         )
 
 link_directories(
         ${CHMSEE_LIBRARY_DIRS}
         )
 
-vala_precompile(MODELS_C
+vala_precompile(CHMSEE_SRCS
+        configuration.vala
+        utils.vala
+        setup.vala
+        chmsee.vala
+
         models/link.vala
+        models/parser.vala
+        models/bookmarksfile.vala
+        models/chmfile.vala
+
+        components/treeview.vala
+        components/index.vala
+        components/toc.vala
+        components/bookmarks.vala
+        components/html-webkit.vala
+        components/book.vala
+
+        main.vala
     PACKAGES
         glib-2.0
-    GENERATE_HEADER
-        models)
+        gio-2.0
+        gee-1.0
+        libxml-2.0
+        gtk+-2.0
+        webkit-1.0
+    OPTIONS
+        --thread
+    CUSTOM_VAPIS
+        ../vapi/chm.vapi)
 
-set(CHMSEE_SRCS
-        chmsee.h chmsee.c
-        setup.h setup.c
-        utils.h utils.c
-        )
-set(CHMSEE_SRCS
-        ${CHMSEE_SRCS}
-        components/book.h components/book.c
-        components/toc.h components/toc.c
-        components/index.h components/index.c
-        components/bookmarks.h components/bookmarks.c
-        components/treeview.h components/treeview.c
-        components/html-webkit.h components/html-webkit.c
-        )
-set(CHMSEE_SRCS
-        ${CHMSEE_SRCS}
-        ${MODELS_C}
-        models/bookmarksfile.h models/bookmarksfile.c
-        models/chmfile.h models/chmfile.c
-        models/parser.h models/parser.c
-        )
-
-add_library(chmseelib STATIC ${CHMSEE_SRCS})
-target_link_libraries(chmseelib
-        ${CHMSEE_LIBRARIES}
-        )
-
-add_executable(chmsee main.c)
+add_executable(chmsee ${CHMSEE_SRCS})
 target_link_libraries(chmsee
-        chmseelib
+        ${CHMSEE_LIBRARIES}
         )
 set_target_properties(chmsee
         PROPERTIES LINKER_LANGUAGE CXX
         )
 
 install(TARGETS chmsee DESTINATION bin)
+

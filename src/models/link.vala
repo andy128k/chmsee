@@ -17,24 +17,41 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-enum LinkType {
+using Gee;
+
+public enum LinkType {
     BOOK,
     PAGE,
 }
 
-class Link {
+public class Link {
     public string name;
     public string uri;
-    public LinkType type;
+    public ArrayList<Link> children;
 
-    public Link(LinkType type, string name, string uri) {
-        this.type = type;
+    public Link(string name, string uri) {
         this.name = name;
         this.uri = uri;
+        this.children = new ArrayList<Link>();
     }
 
-    public Link copy() {
-        return new Link(type, name, uri);
+    public LinkType type() {
+        if (children.size != 0)
+            return LinkType.BOOK;
+        else
+            return LinkType.PAGE;
+    }
+
+    private void collect(ArrayList<Link> output) {
+        output.add(this);
+        foreach (Link child in children)
+            child.collect(output);
+    }
+
+    public ArrayList<Link> flatten() {
+        ArrayList<Link> result = new ArrayList<Link>();
+        collect(result);
+        return result;
     }
 }
 

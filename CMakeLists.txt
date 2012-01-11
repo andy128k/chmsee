@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/vala)
 find_package(PkgConfig)
 find_package(Vala REQUIRED)
 
-pkg_check_modules (CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 libxml-2.0 gtk+-2.0>=2.18 nspr)
+pkg_check_modules (CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 nspr)
 pkg_search_module(WEBKIT REQUIRED webkit-1.0)
 
 set(CHMSEE_INCLUDE_DIRS ${CHMSEE_INCLUDE_DIRS} ${WEBKIT_INCLUDE_DIRS})
@@ -25,8 +25,8 @@ set(CHMSEE_NO_LINK "chmsee_no_link")
 set(CHMSEE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/chmsee")
 set(CHMSEE_BOOKSHELF_DEFAULT "bookshelf")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/src/config.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/configuration.vala.in
+               ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration.vala @ONLY)
 
 find_program(INTLTOOL_MERGE intltool-merge)
 if(${INTLTOOL_MERGE} STREQUAL "INTLTOOL_MERGE-NOTFOUND")
