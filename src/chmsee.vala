@@ -70,13 +70,13 @@ class Chmsee : Window {
     public string variable_font {
         get {
             if (chmfile != null)
-                return chmfile.variable_font;
+                return chmfile.settings.variable_font;
             else
                 return config.variable_font;
         }
         set {
             if (chmfile != null)
-                chmfile.variable_font = value;
+                chmfile.settings.variable_font = value;
             else
                 config.variable_font = value;
         }
@@ -85,13 +85,13 @@ class Chmsee : Window {
     public string fixed_font {
         get {
             if (chmfile != null)
-                return chmfile.fixed_font;
+                return chmfile.settings.fixed_font;
             else
                 return config.fixed_font;
         }
         set {
             if (chmfile != null)
-                chmfile.fixed_font = value;
+                chmfile.settings.fixed_font = value;
             else
                 config.fixed_font = value;
         }
@@ -100,13 +100,13 @@ class Chmsee : Window {
     public string charset {
         get {
             if (chmfile != null)
-                return chmfile.charset;
+                return chmfile.settings.charset;
             else
                 return config.charset;
         }
         set {
             if (chmfile != null) {
-                chmfile.charset = value;
+                chmfile.settings.charset = value;
                 book.reload_current_page();
             } else {
                 config.charset = value;
@@ -668,14 +668,14 @@ class Chmsee : Window {
             chmfile = new CsChmfile(filename, config.bookshelf);
 
             /* set global charset and font to this file */
-            if (chmfile.charset.length == 0 && config.charset.length != 0)
-                chmfile.charset = config.charset;
+            if (chmfile.settings.charset == "")
+                chmfile.settings.charset = config.charset;
 
-            if (chmfile.variable_font == null || chmfile.variable_font.length == 0)
-                chmfile.variable_font = config.variable_font;
+            if (chmfile.settings.variable_font == "")
+                chmfile.settings.variable_font = config.variable_font;
 
-            if (chmfile.fixed_font.length == 0)
-                chmfile.fixed_font = config.fixed_font;
+            if (chmfile.settings.fixed_font == "")
+                chmfile.settings.fixed_font = config.fixed_font;
 
             state = CsState.LOADING;
 
@@ -691,7 +691,7 @@ class Chmsee : Window {
                 });
 
             /* update window title */
-            set_title("%s - ChmSee".printf(chmfile.bookname));
+            set_title("%s - ChmSee".printf(chmfile.bookinfo.bookname));
 
             /* record last opened file */
             config.last_file = chmfile.chm;

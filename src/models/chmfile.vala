@@ -41,10 +41,8 @@ static string convert_filename_to_utf8(string filename, string codeset) throws C
 
 static string MD5File(string filename) throws FileError {
     uint8[] contents;
-    if (FileUtils.get_data(filename, out contents))
-        return Checksum.compute_for_data(ChecksumType.MD5, contents);
-    else
-        return "";
+    FileUtils.get_data(filename, out contents);
+    return Checksum.compute_for_data(ChecksumType.MD5, contents);
 }
 
 static uint32 get_dword(uint8[] buf, uint offset) {
@@ -69,116 +67,128 @@ static string get_asciiz(uint8[] buf, uint offset) {
     return get_string(buf, offset, length);
 }
 
-public class CsChmfile {
-    public Link toc_tree { get; private set; }
-    public ArrayList<Link> toc_list { get; private set; }
-    public ArrayList<Link> index_list { get; private set; }
-    public ArrayList<Link> bookmarks_list { get; private set; }
+public class Bookinfo {
 
-    private string hhc;
-    private string hhk;
-    public string bookfolder { get; private set; }     /* the folder CHM file extracted to */
-    public string chm { get; private set; } /* opened CHM file name */ // rename to 'filename'
-    public string page { get; private set; }           /* :: specified page */
-
-    public string bookname { get; private set; }
-    public string homepage { get; private set; }
-    private string encoding = "UTF-8";       /* retrieved from chmfile */
-
-    public string variable_font { get; set; }
-    public string fixed_font { get; set; }
-    public string charset { get; set; }      /* user specified on setup window */
-
-    private void file_info() throws ConvertError {
-        Chm.File cfd = new Chm.File(chm);
-
-        if (cfd == null) {
-            // g_error(_("Can not open chm file %s."), chm);
-            return;
+    private string hhc_ = "";
+    public string hhc {
+        get {
+            return hhc_;
         }
+        private set {
+            if (hhc_ == "" && value.ascii_casecmp("(null)") != 0 && check_file(value))
+                hhc_ = value;
+        }
+    }
 
-        system_info(cfd);
-        windows_info(cfd);
+    private string hhk_ = "";
+    public string hhk {
+        get {
+            return hhk_;
+        }
+        private set {
+            if (hhk_ == "" && check_file(value))
+                hhk_ = value;
+        }
+    }
 
-        if (hhc != null) {
-            string new_hhc = check_file_ncase(hhc);
-            if (new_hhc != null)
+    private string bookname_ = "";
+    public string bookname {
+        get {
+            return bookname_;
+        }
+        private set {
+            if (value != "")
+                bookname_ = value;
+        }
+    }
+
+    private string homepage_ = "";
+    public string homepage {
+        get {
+            return homepage_;
+        }
+        private set {
+            if (value != "" && value != "/")
+                homepage_ = value;
+        }
+    }
+
+    public string encoding = "UTF-8";
+
+    private Chm.File cfd = null;
+
+    private bool check_file(string s) {
+        if (cfd == null)
+            return true;
+        Chm.UnitInfo ui = Chm.UnitInfo();
+        return cfd.resolve_object(s, &ui) == Chm.ResolveStatus.SUCCESS;
+    }
+
+    private static string check_file_ncase(string bookfolder, string file) {
+        string filename = Path.build_filename(bookfolder, file);
+        string new_file = "";
+
+        if (!FileUtils.test(filename, FileTest.EXISTS)) {
+            string found = file_exist_ncase(filename);
+            if (found != "")
+                new_file = Path.get_basename(found);
+        }
+        return new_file;
+    }
+
+    public Bookinfo.extract(string bookfolder, string filename) throws Error {
+        Chm.File cfd = new Chm.File(filename);
+        if (cfd == null)
+            throw new IOError.FAILED(_("Can not open chm file %s."), filename);
+
+        read_system_info(cfd);
+        read_windows_info(cfd);
+
+        if (hhc != "") {
+            string new_hhc = check_file_ncase(bookfolder, hhc);
+            if (new_hhc != "")
                 hhc = new_hhc;
         }
 
-        if (hhk != null) {
-            string new_hhk = check_file_ncase(hhk);
-            if (new_hhk != null)
+        if (hhk != "") {
+            string new_hhk = check_file_ncase(bookfolder, hhk);
+            if (new_hhk != "")
                 hhk = new_hhk;
         }
 
         /* Convert encoding to UTF-8 */
-        if (encoding != null) {
-            if (bookname != null)
+        if (encoding != "") {
+            if (bookname != "")
                 bookname = convert_string_to_utf8(bookname, encoding);
 
-            if (hhc != null)
+            if (hhc != "")
                 hhc = convert_filename_to_utf8(hhc, encoding);
 
-            if (hhk != null)
+            if (hhk != "")
                 hhk = convert_filename_to_utf8(hhk, encoding);
 
-            if (homepage != null)
+            if (homepage != "")
                 homepage = convert_filename_to_utf8(homepage, encoding);
         }
 
-        if (bookname == null)
-            bookname = Path.get_basename(chm);
+        if (bookname == "")
+            bookname = Path.get_basename(filename);
     }
 
-    private void windows_info(Chm.File cfd) {
-        Chm.UnitInfo ui = Chm.UnitInfo();
-        uint8[] buffer = new uint8[4096];
-        int64 size = 0;
-        uint32 entries, entry_size;
-        uint32 hhc, hhk, bookname, homepage;
+    public Bookinfo.load(string bookfolder) throws Error {
+        string bookinfo_file = Path.build_filename(bookfolder, Configuration.BOOKINFO_FILE);
 
-        if (cfd.resolve_object("/#WINDOWS", &ui) != Chm.ResolveStatus.SUCCESS)
-            return;
+        KeyFile keyfile = new KeyFile();
+        keyfile.load_from_file(bookinfo_file, KeyFileFlags.NONE);
 
-        size = cfd.retrieve_object(&ui, buffer, 0, 8);
-
-        if (size < 8)
-            return;
-
-        entries = get_dword(buffer, 0);
-        if (entries < 1)
-            return;
-
-        entry_size = get_dword(buffer, 4);
-        size = cfd.retrieve_object(&ui, buffer, 8, entry_size);
-        if (size < entry_size)
-            return;
-
-        hhc = get_dword(buffer, 0x60);
-        hhk = get_dword(buffer, 0x64);
-        homepage = get_dword(buffer, 0x68);
-        bookname = get_dword(buffer, 0x14);
-
-        if (cfd.resolve_object("/#STRINGS", &ui) != Chm.ResolveStatus.SUCCESS)
-            return;
-
-        size = cfd.retrieve_object(&ui, buffer, 0, 4096);
-
-        if (size == 0)
-            return;
-
-        if (this.hhc == null && hhc != 0)
-            this.hhc = "/" + get_asciiz(buffer, hhc);
-        if (this.hhk == null && hhk != 0)
-            this.hhk = "/" + get_asciiz(buffer, hhk);
-        if ((this.homepage == null || this.homepage == "/") && homepage != 0)
-            this.homepage = "/" + get_asciiz(buffer, homepage);
-        if (this.bookname == null && bookname != 0)
-            this.bookname = get_asciiz(buffer, bookname);
+        hhc      = keyfile.get_string("Bookinfo", "hhc");
+        hhk      = keyfile.get_string("Bookinfo", "hhk");
+        homepage = keyfile.get_string("Bookinfo", "homepage");
+        bookname = keyfile.get_string("Bookinfo", "bookname");
+        encoding = keyfile.get_string("Bookinfo", "encoding");
     }
 
-    private void system_info(Chm.File cfd) {
+    private void read_system_info(Chm.File cfd) {
         Chm.UnitInfo ui = Chm.UnitInfo();
 
         uint8[] buffer = new uint8[4096];
@@ -193,12 +203,7 @@ public class CsChmfile {
 
         buffer[size - 1] = 0;
 
-        for(;;) {
-            // This condition won't hold if I process anything
-            // except NUL-terminated strings!
-            if (index > size - 3)
-                break;
-
+        while (index < size - 4) {
             uint16 value = get_word(buffer, index);
             uint16 length = get_word(buffer, index+2);
             index += 4;
@@ -217,55 +222,67 @@ public class CsChmfile {
                     bookname = get_string(buffer, index, length);
                     break;
                 case 4:
-                    // LCID stuff
                     encoding = get_encoding_by_lcid(get_dword(buffer, index));
                     break;
                 case 6:
-                    if (this.hhc == "") {
-                        string n = get_string(buffer, index, length);
-                        string hhc = "/" + n + ".hhc";
-                        string hhk = "/" + n + ".hhk";
-
-                        if (cfd.resolve_object(hhc, &ui) == Chm.ResolveStatus.SUCCESS)
-                            this.hhc = hhc;
-
-                        if (cfd.resolve_object(hhk, &ui) == Chm.ResolveStatus.SUCCESS)
-                            this.hhk = hhk;
-                    }
+                    string n = get_string(buffer, index, length);
+                    hhc = "/" + n + ".hhc";
+                    hhk = "/" + n + ".hhk";
                     break;
             }
-
             index += length;
         }
     }
 
-    private void load_bookinfo() throws Error {
-        string bookinfo_file = Path.build_filename(bookfolder, Configuration.BOOKINFO_FILE);
-        KeyFile keyfile = new KeyFile();
-        bool rv = keyfile.load_from_file(bookinfo_file, KeyFileFlags.NONE);
+    private void read_windows_info(Chm.File cfd) {
+        Chm.UnitInfo ui = Chm.UnitInfo();
+        uint8[] buffer = new uint8[4096];
+        int64 size = 0;
 
-        if (rv) {
-            hhc      = keyfile.get_string("Bookinfo", "hhc");
-            hhk      = keyfile.get_string("Bookinfo", "hhk");
-            homepage = keyfile.get_string("Bookinfo", "homepage");
-            bookname = keyfile.get_string("Bookinfo", "bookname");
-            encoding = keyfile.get_string("Bookinfo", "encoding");
+        if (cfd.resolve_object("/#WINDOWS", &ui) != Chm.ResolveStatus.SUCCESS)
+            return;
 
-            string vfont = keyfile.get_string("Bookinfo", "variable_font");
-            if (vfont != "")
-                variable_font = vfont;
+        size = cfd.retrieve_object(&ui, buffer, 0, 8);
 
-            string ffont = keyfile.get_string("Bookinfo", "fixed_font");
-            if (ffont != "")
-                fixed_font = ffont;
+        if (size < 8)
+            return;
 
-            string charset = keyfile.get_string("Bookinfo", "charset");
-            if (charset != "")
-                this.charset = charset;
-        }
+        uint32 entries = get_dword(buffer, 0);
+        if (entries < 1)
+            return;
+
+        uint32 entry_size = get_dword(buffer, 4);
+        size = cfd.retrieve_object(&ui, buffer, 8, entry_size);
+        if (size < entry_size)
+            return;
+
+        uint32 hhc_offset = get_dword(buffer, 0x60);
+        uint32 hhk_offset = get_dword(buffer, 0x64);
+        uint32 homepage_offset = get_dword(buffer, 0x68);
+        uint32 bookname_offset = get_dword(buffer, 0x14);
+
+        if (cfd.resolve_object("/#STRINGS", &ui) != Chm.ResolveStatus.SUCCESS)
+            return;
+
+        size = cfd.retrieve_object(&ui, buffer, 0, 4096);
+
+        if (size == 0)
+            return;
+
+        if (hhc_offset != 0)
+            hhc = "/" + get_asciiz(buffer, hhc_offset);
+
+        if (hhk_offset != 0)
+            hhk = "/" + get_asciiz(buffer, hhk_offset);
+
+        if (homepage_offset != 0)
+            homepage = "/" + get_asciiz(buffer, homepage_offset);
+
+        if (bookname_offset != 0)
+            bookname = get_asciiz(buffer, bookname_offset);
     }
 
-    private void save_bookinfo() throws Error {
+    public void save(string bookfolder) throws Error {
         string bookinfo_file = Path.build_filename(bookfolder, Configuration.BOOKINFO_FILE);
 
         KeyFile keyfile = new KeyFile();
@@ -279,25 +296,69 @@ public class CsChmfile {
         if (bookname != "")
             keyfile.set_string("Bookinfo", "bookname", bookname);
         keyfile.set_string("Bookinfo", "encoding", encoding);
-        keyfile.set_string("Bookinfo", "variable_font", variable_font);
-        keyfile.set_string("Bookinfo", "fixed_font", fixed_font);
-        keyfile.set_string("Bookinfo", "charset", charset);
 
         FileUtils.set_data(bookinfo_file, (uint8[])keyfile.to_data().to_utf8());
     }
+}
 
-    private string check_file_ncase(string file) {
-        string filename = Path.build_filename(bookfolder, file);
-        string new_file = "";
+public class BookSettings {
+    public string variable_font = "";
+    public string fixed_font = "";
+    public string charset = ""; /* user specified on setup window */
 
-        if (!FileUtils.test(filename, FileTest.EXISTS)) {
-            string found = file_exist_ncase(filename);
-            if (found != "")
-                new_file = Path.get_basename(found);
-        }
-        return new_file;
+    private string filename(string bookfolder) {
+        return Path.build_filename(bookfolder, Configuration.BOOK_SETTINGS_FILE);
     }
 
+    public void load(string bookfolder) {
+        try {
+            KeyFile keyfile = new KeyFile();
+            keyfile.load_from_file(filename(bookfolder), KeyFileFlags.NONE);
+
+            string vfont = keyfile.get_string("settings", "variable_font");
+            if (vfont != "")
+                variable_font = vfont;
+
+            string ffont = keyfile.get_string("settings", "fixed_font");
+            if (ffont != "")
+                fixed_font = ffont;
+
+            string ch = keyfile.get_string("settings", "charset");
+            if (ch != "")
+                charset = ch;
+        } catch (KeyFileError e) {
+            // TODO: show warning
+        } catch (FileError e) {
+            // TODO: show warning
+        }
+    }
+
+    public void save(string bookfolder) {
+        try {
+            KeyFile keyfile = new KeyFile();
+            keyfile.set_string("setting", "variable_font", variable_font);
+            keyfile.set_string("setting", "fixed_font", fixed_font);
+            keyfile.set_string("setting", "charset", charset);
+
+            FileUtils.set_data(filename(bookfolder), (uint8[])keyfile.to_data().to_utf8());
+        } catch (FileError e) {
+            // TODO: show warning
+        }
+    }
+}
+
+public class CsChmfile {
+    public Link toc_tree { get; private set; }
+    public ArrayList<Link> toc_list { get; private set; }
+    public ArrayList<Link> index_list { get; private set; }
+    public ArrayList<Link> bookmarks_list { get; private set; }
+
+    public string bookfolder { get; private set; }     /* the folder CHM file extracted to */
+    public string chm { get; private set; } /* opened CHM file name */ // rename to 'filename'
+    public string page { get; private set; }           /* :: specified page */
+
+    public Bookinfo bookinfo = new Bookinfo();
+    public BookSettings settings = new BookSettings();
 
     /* see http://code.google.com/p/chmsee/issues/detail?id=12 */
     private static void extract_post_file_write(string fname) {
@@ -404,29 +465,31 @@ public class CsChmfile {
 
         /* If this chmfile already exists in the bookshelf, load it's bookinfo file */
         if (FileUtils.test(bookfolder, FileTest.IS_DIR)) {
-            load_bookinfo();
+            bookinfo = new Bookinfo.load(bookfolder);
         } else {
             if (!extract_chm(chm, bookfolder)) {
                 return;
             }
 
-            file_info();
-            save_bookinfo();
+            bookinfo = new Bookinfo.extract(bookfolder, chm);
         }
 
-        /* Parse hhc file */
-        if (hhc != null && hhc.ascii_casecmp("(null)") != 0) {
-            string hhcfile = Path.build_filename(bookfolder, hhc);
+        settings.load(bookfolder);
+        // settings.save(bookfolder);
 
-            toc_tree = cs_parse_file(hhcfile, encoding);
+        /* Parse hhc file */
+        if (bookinfo.hhc != "") {
+            string hhcfile = Path.build_filename(bookfolder, bookinfo.hhc);
+
+            toc_tree = cs_parse_file(hhcfile, bookinfo.encoding);
             toc_list = toc_tree.flatten();
         }
 
         /* Parse hhk file */
-        if (hhk != null && index_list == null) {
-            string hhkfile = Path.build_filename(bookfolder, hhk);
+        if (bookinfo.hhk != "") {
+            string hhkfile = Path.build_filename(bookfolder, bookinfo.hhk);
 
-            Link tree = cs_parse_file(hhkfile, encoding);
+            Link tree = cs_parse_file(hhkfile, bookinfo.encoding);
             index_list = tree.flatten();
         }
 
@@ -444,7 +507,7 @@ public class CsChmfile {
 }
 
 static string get_encoding_by_lcid(uint32 lcid) {
-    switch(lcid) {
+    switch (lcid) {
         case 0x0436:
         case 0x042d:
         case 0x0403:
@@ -509,7 +572,7 @@ static string get_encoding_by_lcid(uint32 lcid) {
         case 0x0441:
         case 0x041d:
         case 0x081d:
-                return "ISO-8859-1";
+            return "ISO-8859-1";
         case 0x041c:
         case 0x041a:
         case 0x0405:
@@ -518,13 +581,13 @@ static string get_encoding_by_lcid(uint32 lcid) {
         case 0x041b:
         case 0x0424:
         case 0x081a:
-                return "ISO-8859-2";
+            return "ISO-8859-2";
         case 0x0415:
-                return "WINDOWS-1250";
+            return "WINDOWS-1250";
         case 0x0419:
-                return "WINDOWS-1251";
+            return "WINDOWS-1251";
         case 0x0c01:
-                return "WINDOWS-1256";
+            return "WINDOWS-1256";
         case 0x0401:
         case 0x0801:
         case 0x1001:
@@ -542,32 +605,32 @@ static string get_encoding_by_lcid(uint32 lcid) {
         case 0x4001:
         case 0x0429:
         case 0x0420:
-                return "ISO-8859-6";
+            return "ISO-8859-6";
         case 0x0408:
-                return "ISO-8859-7";
+            return "ISO-8859-7";
         case 0x040d:
-                return "ISO-8859-8";
+            return "ISO-8859-8";
         case 0x042c:
         case 0x041f:
         case 0x0443:
-                return "ISO-8859-9";
+            return "ISO-8859-9";
         case 0x041e:
-                return "ISO-8859-11";
+            return "ISO-8859-11";
         case 0x0425:
         case 0x0426:
         case 0x0427:
-                return "ISO-8859-13";
+            return "ISO-8859-13";
         case 0x0411:
-                return "cp932";
+            return "cp932";
         case 0x0804:
         case 0x1004:
-                return "cp936";
+            return "cp936";
         case 0x0412:
-                return "cp949";
+            return "cp949";
         case 0x0404:
         case 0x0c04:
         case 0x1404:
-                return "cp950";
+            return "cp950";
         case 0x082c:
         case 0x0423:
         case 0x0402:
@@ -577,9 +640,9 @@ static string get_encoding_by_lcid(uint32 lcid) {
         case 0x0444:
         case 0x0422:
         case 0x0843:
-                return "cp1251";
+            return "cp1251";
         default:
-                return "";
+            return "";
     }
 }
 

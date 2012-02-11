@@ -451,8 +451,8 @@ public class CsBook : VBox {
         this.model = model;
 
         if (active_html != null) {
-            active_html.set_variable_font(model.variable_font);
-            active_html.set_fixed_font(model.fixed_font);
+            active_html.set_variable_font(model.settings.variable_font);
+            active_html.set_fixed_font(model.settings.fixed_font);
         }
 
         int cur_page = 0;
@@ -541,8 +541,8 @@ public class CsBook : VBox {
             string location = active_html.get_location();
             if (force_reload || full_uri != location) {
                 /* set user specified charset */
-                string? charset = model.charset;
-                if (charset != null && charset.length != 0)
+                string charset = model.settings.charset;
+                if (charset != "")
                     active_html.set_charset(charset);
 
                 SignalHandler.block_by_func(active_html, (void*)html_open_uri_cb, this);
@@ -595,21 +595,21 @@ public class CsBook : VBox {
 
     public void reload_current_page() {
         if (model != null) {
-            string? charset = model.charset;
-            if (charset != null && charset.length != 0)
+            string charset = model.settings.charset;
+            if (charset != "")
                 active_html.set_charset(charset);
             active_html.view.reload();
         }
     }
 
     public void homepage() {
-        string? homepage = model.homepage;
-        if (homepage != null)
+        string homepage = model.bookinfo.homepage;
+        if (homepage != "")
             load_url(homepage, false);
     }
 
     public bool has_homepage() {
-        return model.homepage != null;
+        return model.bookinfo.homepage != "";
     }
 
     public bool can_go_back() {

@@ -13,8 +13,11 @@ namespace Configuration {
 
     public const string DATA_DIR = "@CHMSEE_DATA_DIR@";
     public const string CONFIG_FILE = "@CHMSEE_CONFIG_FILE@";
+
     public const string BOOKMARKS_FILE = "@CHMSEE_BOOKMARKS_FILE@";
     public const string BOOKINFO_FILE = "@CHMSEE_BOOKINFO_FILE@";
+    public const string BOOK_SETTINGS_FILE = "@CHMSEE_BOOK_SETTINGS_FILE@";
+
     public const string NO_LINK = "@CHMSEE_NO_LINK@";
     public const string BOOKSHELF_DEFAULT = "@CHMSEE_BOOKSHELF_DEFAULT@";
 }
