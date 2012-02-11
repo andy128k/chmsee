@@ -19,11 +19,6 @@
 
 using Gee;
 
-public enum LinkType {
-    BOOK,
-    PAGE,
-}
-
 public class Link {
     public string name;
     public string uri;
@@ -35,11 +30,8 @@ public class Link {
         this.children = new ArrayList<Link>();
     }
 
-    public LinkType type() {
-        if (children.size != 0)
-            return LinkType.BOOK;
-        else
-            return LinkType.PAGE;
+    public bool has_children() {
+        return children.size > 0;
     }
 
     private void collect(ArrayList<Link> output) {

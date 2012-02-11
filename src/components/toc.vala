@@ -109,7 +109,7 @@ public class CsToc : VBox {
         TreeIter iter;
         store.append(out iter, parent_iter);
 
-        if (link.type() == LinkType.BOOK) {
+        if (link.has_children()) {
             store.set(iter,
                       TocColumns.COL_OPEN_PIXBUF, pixbuf_opened,
                       TocColumns.COL_CLOSED_PIXBUF, pixbuf_closed,
