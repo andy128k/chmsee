@@ -132,6 +132,9 @@ class CsHtmlWebkit : Frame {
     }
 
     private bool split_font_string(string? font_name, out string name, out int size) {
+        name = null;
+        size = 0;
+
         if (font_name == null)
             return false;
 
@@ -148,21 +151,21 @@ class CsHtmlWebkit : Frame {
     public void set_variable_font(string font_name) {
         string name;
         int size;
-        split_font_string(font_name, out name, out size);
-
-        WebSettings settings = view.get_settings();
-        settings.default_font_family = name;
-        settings.default_font_size = size;
+        if (split_font_string(font_name, out name, out size)) {
+            WebSettings settings = view.get_settings();
+            settings.default_font_family = name;
+            settings.default_font_size = size;
+        }
     }
 
     public void set_fixed_font(string font_name) {
         string name;
         int size;
-        split_font_string(font_name, out name, out size);
-
-        WebSettings settings = view.get_settings();
-        settings.monospace_font_family = name;
-        settings.default_monospace_font_size = size;
+        if (split_font_string(font_name, out name, out size)) {
+            WebSettings settings = view.get_settings();
+            settings.monospace_font_family = name;
+            settings.default_monospace_font_size = size;
+        }
     }
 
     public void set_charset(string charset) {
