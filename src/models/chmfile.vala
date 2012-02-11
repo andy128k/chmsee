@@ -108,17 +108,17 @@ public class CsChmfile {
         }
     }
 
-    static bool extract_chm(string filename, string base_path) {
+    static void extract_chm(string filename, string base_path) throws IOError {
         Chm.File handle = new Chm.File(filename);
-
-        if (handle == null) {
-            return false;
-        }
+        if (handle == null)
+            throw new IOError.NOT_FOUND(_("File '%s' was not found."), filename);
 
         ExtractContext ec = new ExtractContext();
         ec.base_path = base_path;
 
-        return handle.enumerate(Chm.Enumerate.NORMAL | Chm.Enumerate.SPECIAL, ec._extract_callback);
+        bool r = handle.enumerate(Chm.Enumerate.NORMAL | Chm.Enumerate.SPECIAL, ec._extract_callback);
+        if (!r)
+            throw new IOError.FAILED(_("File '%s' cannot be extracted."), filename);
     }
 
     private void parse_filename(string filename) {
@@ -145,10 +145,7 @@ public class CsChmfile {
         if (FileUtils.test(bookfolder, FileTest.IS_DIR)) {
             bookinfo = new Bookinfo.load(bookfolder);
         } else {
-            if (!extract_chm(chm, bookfolder)) {
-                return;
-            }
-
+            extract_chm(chm, bookfolder);
             bookinfo = new Bookinfo.extract(bookfolder, chm);
         }
 
