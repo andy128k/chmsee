@@ -23,7 +23,7 @@ set(CHMSEE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/chmsee")
 set(CHMSEE_BOOKSHELF_DEFAULT "bookshelf")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/configuration.vala.in
-               ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration.vala @ONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/src/configuration.vala @ONLY)
 
 find_program(INTLTOOL_MERGE intltool-merge)
 if(${INTLTOOL_MERGE} STREQUAL "INTLTOOL_MERGE-NOTFOUND")

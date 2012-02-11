@@ -15,7 +15,8 @@ link_directories(
         )
 
 vala_precompile(CHMSEE_SRCS
-        configuration.vala
+        ${CMAKE_CURRENT_BINARY_DIR}/configuration.vala
+
         utils.vala
         setup.vala
         chmsee.vala

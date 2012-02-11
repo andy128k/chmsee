@@ -26,3 +26,5 @@ gtester.xml
 report.html
 test/test
 install_manifest.txt
+src/configuration.vala
+
