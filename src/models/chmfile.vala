@@ -432,14 +432,14 @@ public class CsChmfile {
 
         /* Load bookmarks */
         string bookmarks_file = Path.build_filename(bookfolder, Configuration.BOOKMARKS_FILE);
-        bookmarks_list = cs_bookmarks_file_load(bookmarks_file);
+        bookmarks_list = Bookmarks.load(bookmarks_file);
     }
 
     public void update_bookmarks_list(ArrayList<Link> links) {
         bookmarks_list = links;
 
         string bookmarks_file = Path.build_filename(bookfolder, Configuration.BOOKMARKS_FILE);
-        cs_bookmarks_file_save(bookmarks_list, bookmarks_file);
+        Bookmarks.save(bookmarks_list, bookmarks_file);
     }
 }
 

@@ -52,12 +52,12 @@ class CsHtmlWebkit : Frame {
         view.button_press_event.connect(webkit_web_view_mouse_click_cb);
         view.hovering_over_link.connect(webkit_web_view_hovering_over_link_cb);
         view.notify["load-status"].connect(notify_load_status);
-        view.title_changed.connect(webkit_title_cb);
+        view.notify["title"].connect(webkit_title_cb);
     }
 
-    private void webkit_title_cb(WebFrame frame, string title) {
-        string uri = frame.get_uri();
-        title_changed(this, title);
+    private void webkit_title_cb() {
+        string uri = view.get_main_frame().get_uri();
+        title_changed(this, view.title);
         location_changed(uri);
     }
 

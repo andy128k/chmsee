@@ -172,13 +172,6 @@ public class CsBook : VBox {
         show_all();
     }
 
-    ~CsBook() {
-        if (model != null) {
-            ArrayList<Link> old_list = bookmarks_page.get_model();
-            model.update_bookmarks_list(old_list);
-        }
-    }
-
     private void find_entry_changed_cb() {
         find_text();
     }
@@ -488,6 +481,7 @@ public class CsBook : VBox {
         bookmarks_page.set_model(bookmarks_list);
         cur_page = control_notebook.append_page(bookmarks_page, new Label(_("Bookmarks")));
         bookmarks_page.link_selected.connect(link_selected_cb);
+        bookmarks_page.bookmarks_updated.connect(bookmarks_updated_cb);
 
         if (bookmarks_list.size == 0)
             cur_page = 0;
@@ -578,6 +572,10 @@ public class CsBook : VBox {
             update_tab_label_state();
             load_url(get_short_uri(model, full_uri), true);
         }
+    }
+
+    public void bookmarks_updated_cb(ArrayList<Link> links) {
+        model.update_bookmarks_list(links);
     }
 
     public bool can_close_tab() {

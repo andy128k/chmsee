@@ -23,6 +23,7 @@ using Gtk;
 
 public class CsBookmarks : VBox {
     public signal void link_selected(Link link);
+    public signal void bookmarks_updated(ArrayList<Link> links);
 
     private CsTreeView treeview;
     private Entry entry;
@@ -110,6 +111,7 @@ public class CsBookmarks : VBox {
 
             treeview.add_link(link);
         }
+        bookmarks_updated(links);
     }
 
     private void on_bookmarks_remove() {
@@ -118,8 +120,10 @@ public class CsBookmarks : VBox {
             treeview.remove_link(link);
 
             int index = find_link_by_uri(link.uri);
-            if (index >= 0)
+            if (index >= 0) {
                 links.remove_at(index);
+                bookmarks_updated(links);
+            }
         }
     }
 
