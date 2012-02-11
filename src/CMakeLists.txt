@@ -23,6 +23,8 @@ vala_precompile(CHMSEE_SRCS
         models/link.vala
         models/parser.vala
         models/bookmarksfile.vala
+
+        models/extract_chm.vala
         models/bookinfo.vala
         models/booksettings.vala
         models/chmfile.vala
