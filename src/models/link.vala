@@ -34,15 +34,15 @@ public class Link {
         return children.size > 0;
     }
 
-    private void collect(ArrayList<Link> output) {
-        output.add(this);
-        foreach (Link child in children)
-            child.collect(output);
+    private static void collect(Link link, ArrayList<Link> output) {
+        output.add(link);
+        foreach (Link child in link.children)
+            collect(child, output);
     }
 
     public ArrayList<Link> flatten() {
         ArrayList<Link> result = new ArrayList<Link>();
-        collect(result);
+        collect(this, result);
         return result;
     }
 }
