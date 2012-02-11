@@ -143,8 +143,6 @@ void save_config(CsConfig config) {
 }
 
 int main(string[] args) {
-    typeof(Configuration).class_ref(); // bump
-
     try {
         string? filename = null;
 

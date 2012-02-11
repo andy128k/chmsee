@@ -1,21 +1,21 @@
-public class Configuration {
-    public static int MAXLINE = 1024;
-    public static int ENTRY_MAX_LENGTH = 80;
-    public static int DEFAULT_WIDTH = 800;
-    public static int DEFAULT_HEIGHT = 600;
+namespace Configuration {
+    public const int MAXLINE = 1024;
+    public const int ENTRY_MAX_LENGTH = 80;
+    public const int DEFAULT_WIDTH = 800;
+    public const int DEFAULT_HEIGHT = 600;
 
-    public static string PACKAGE = "@CMAKE_PROJECT_NAME@";
-    public static string GETTEXT_PACKAGE = "@CMAKE_PROJECT_NAME@";
-    public static string PACKAGE_VERSION = "@PACKAGE_VERSION@";
+    public const string PACKAGE = "@CMAKE_PROJECT_NAME@";
+    public const string GETTEXT_PACKAGE = "@CMAKE_PROJECT_NAME@";
+    public const string PACKAGE_VERSION = "@PACKAGE_VERSION@";
 
-    public static string PACKAGE_STRING = "chmsee @PACKAGE_VERSION@";
-    public static string PACKAGE_LOCALE_DIR = "@CMAKE_INSTALL_PREFIX@/share/locale";
+    public const string PACKAGE_STRING = "chmsee @PACKAGE_VERSION@";
+    public const string PACKAGE_LOCALE_DIR = "@CMAKE_INSTALL_PREFIX@/share/locale";
 
-    public static string DATA_DIR = "@CHMSEE_DATA_DIR@";
-    public static string CONFIG_FILE = "@CHMSEE_CONFIG_FILE@";
-    public static string BOOKMARKS_FILE = "@CHMSEE_BOOKMARKS_FILE@";
-    public static string BOOKINFO_FILE = "@CHMSEE_BOOKINFO_FILE@";
-    public static string NO_LINK = "@CHMSEE_NO_LINK@";
-    public static string BOOKSHELF_DEFAULT = "@CHMSEE_BOOKSHELF_DEFAULT@";
+    public const string DATA_DIR = "@CHMSEE_DATA_DIR@";
+    public const string CONFIG_FILE = "@CHMSEE_CONFIG_FILE@";
+    public const string BOOKMARKS_FILE = "@CHMSEE_BOOKMARKS_FILE@";
+    public const string BOOKINFO_FILE = "@CHMSEE_BOOKINFO_FILE@";
+    public const string NO_LINK = "@CHMSEE_NO_LINK@";
+    public const string BOOKSHELF_DEFAULT = "@CHMSEE_BOOKSHELF_DEFAULT@";
 }
 
