@@ -13,7 +13,7 @@ find_package(Vala REQUIRED)
 pkg_check_modules(CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 webkit-1.0)
 
 set(CHMSEE_CFLAGS_OTHER ${CHMSEE_CFLAGS_OTHER} -Wall)
-set(CHMSEE_LIBRARIES ${CHMSEE_LIBRARIES} chm gcrypt)
+set(CHMSEE_LIBRARIES ${CHMSEE_LIBRARIES} chm)
 
 set(CHMSEE_CONFIG_FILE "config")
 set(CHMSEE_BOOKMARKS_FILE "chmsee_bookmarks")

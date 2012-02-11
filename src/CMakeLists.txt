@@ -24,6 +24,7 @@ vala_precompile(CHMSEE_SRCS
         models/parser.vala
         models/bookmarksfile.vala
         models/bookinfo.vala
+        models/booksettings.vala
         models/chmfile.vala
 
         components/treeview.vala
