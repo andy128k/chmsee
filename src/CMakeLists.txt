@@ -19,7 +19,6 @@ vala_precompile(CHMSEE_SRCS
 
         utils.vala
         setup.vala
-        chmsee.vala
 
         models/link.vala
         models/parser.vala
@@ -33,6 +32,7 @@ vala_precompile(CHMSEE_SRCS
         components/html-webkit.vala
         components/book.vala
 
+        chmsee.vala
         main.vala
     PACKAGES
         glib-2.0

@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/vala)
 find_package(PkgConfig)
 find_package(Vala REQUIRED)
 
-pkg_check_modules(CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 nspr webkit-1.0)
+pkg_check_modules(CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 webkit-1.0)
 
 set(CHMSEE_CFLAGS_OTHER ${CHMSEE_CFLAGS_OTHER} -Wall)
 set(CHMSEE_LIBRARIES ${CHMSEE_LIBRARIES} chm gcrypt)
