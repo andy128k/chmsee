@@ -49,9 +49,6 @@ add_executable(chmsee ${CHMSEE_SRCS})
 target_link_libraries(chmsee
         ${CHMSEE_LIBRARIES}
         )
-set_target_properties(chmsee
-        PROPERTIES LINKER_LANGUAGE CXX
-        )
 
 install(TARGETS chmsee DESTINATION bin)
 

@@ -1,7 +1,7 @@
 project(chmsee)
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
-set(PACKAGE_VERSION "1.3.1.1" )
+set(PACKAGE_VERSION "1.3.1.1")
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -10,13 +10,10 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/vala)
 find_package(PkgConfig)
 find_package(Vala REQUIRED)
 
-pkg_check_modules (CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 nspr)
-pkg_search_module(WEBKIT REQUIRED webkit-1.0)
+pkg_check_modules(CHMSEE REQUIRED gthread-2.0>=2.22 glib-2.0>=2.22 gee-1.0 libxml-2.0 gtk+-2.0>=2.18 nspr webkit-1.0)
 
-set(CHMSEE_INCLUDE_DIRS ${CHMSEE_INCLUDE_DIRS} ${WEBKIT_INCLUDE_DIRS})
-set(CHMSEE_CFLAGS_OTHER ${CHMSEE_CFLAGS_OTHER} ${WEBKIT_CFLAGS_OTHER} -Wall)
-set(CHMSEE_LIBRARY_DIRS ${CHMSEE_LIBRARY_DIRS} ${WEBKIT_LIBRARY_DIRS})
-set(CHMSEE_LIBRARIES ${CHMSEE_LIBRARIES} ${WEBKIT_LIBRARIES} chm gcrypt)
+set(CHMSEE_CFLAGS_OTHER ${CHMSEE_CFLAGS_OTHER} -Wall)
+set(CHMSEE_LIBRARIES ${CHMSEE_LIBRARIES} chm gcrypt)
 
 set(CHMSEE_CONFIG_FILE "config")
 set(CHMSEE_BOOKMARKS_FILE "chmsee_bookmarks")
